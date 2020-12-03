@@ -1,5 +1,6 @@
 from asyncio.locks import Semaphore
 from datetime import date, datetime, timedelta
+from os import name
 import mmlsattendance
 import discord
 from discord.ext import commands
@@ -27,15 +28,15 @@ kredit to : @japer"""
 
 '''Pls user rosak'''
 
-'''mantap, dah boleh main valo'''
+'''mantap, dah boleh main valo'''  # done
 
-''''sabar sikit woi!'''
+''''sabar sikit woi!'''  # done
 
-'''nak paksa masuk tak ?'''
+'''nak paksa masuk tak ?'''  # done
 
-'''aku dah ada password kau :smirk::smirk:
+'''aku dah ada password kau :smirk::smirk: 
 mantul la per
-nanti tolong hack valorant sekali'''
+nanti tolong hack valorant sekali'''  # done
 
 '''buat pilihan ❌'''
 
@@ -131,12 +132,13 @@ async def login(ctx, studentid=None, password=None):  # change here
             if studentid == None:
                 for i in range(5):
                     try:
+                        await dm_channel.send(f"Reply with your `MMU Student ID` or `cancel` if you change your mind.")
                         studentidmsg = await bot.wait_for("message", check=lambda x: x.author == ctx.author, timeout=7)
                         studentid = studentidmsg.content
                         break
                     except asyncio.TimeoutError:
                         if i == 0:
-                            await dm_channel.send(f"Reply with your `MMU Student ID` or `cancel` if you change your mind.")
+                            # await dm_channel.send(f"Reply with your `MMU Student ID` or `cancel` if you change your mind.")
                             continue
                         elif i == 3:
                             await dm_channel.send(f"Hellooo? Are you there? 😩")
@@ -206,7 +208,7 @@ async def login(ctx, studentid=None, password=None):  # change here
                     {"StudentPassword": password})
                 discordid_to_subjectdatabase[ctx.author.id].update(
                     {"SubjectDB": subjectdatabase})  # subjectdatabase is a class
-                await ctx.send(f"{ctx.author.mention}, I've obtain all your registered subjects from MMLS. ✅")
+                await ctx.send(f"Mantul Pak Abu, {ctx.author.mention} aku dah ada password kau. ✅")
                 print(
                     f"{ctx.author} >>> {discordid_to_subjectdatabase[ctx.author.id]['StudentID']}")
                 return
@@ -220,7 +222,7 @@ async def login(ctx, studentid=None, password=None):  # change here
 async def user(ctx):
     ("\nList of user(s) that is currently using the bot.\n")
     if discordid_to_subjectdatabase:
-        printlist = "User(s) below are currently using the MMLS service: 🧐\n"
+        printlist = "```Under Development``` \nUser(s) below are currently using the MMLS service: 🧐\n"
         for i, discordid in enumerate(discordid_to_subjectdatabase.keys()):
             printlist += f"\n{i+1}.) <@{discordid}> >>> `{discordid_to_subjectdatabase[ctx.author.id]['StudentID']}`"
         # await ctx.send(f"```{discorduserlist.getvalue()}```")
@@ -416,9 +418,10 @@ async def print_subjects(ctx):
         return
 
 
-@bot.command()
+@bot.command(alias=["lancau"])
 async def aiman(ctx):
-    ctx.send()
+    ctx.send("Aiman tak hensem. Dahla Hitam.")
+    return
 
 
 @ bot.command()  # Prototype
@@ -460,7 +463,7 @@ async def sign(ctx, attendance_date_or_url=None):  # here???
                                 f"{scraped_mmls.subject_code} - {scraped_mmls.subject_name}\t({scraped_mmls.start_time}-{scraped_mmls.end_time}, {scraped_mmls.class_date})", file=file)
                             msg_here = await ctx.send(f"```{file.getvalue()}```")
                             await msg_here.add_reaction("✅")
-                            await ctx.send("Do you want to force-sign-in this attendance? 😈")
+                            await ctx.send("Nak paksa signkan tak ? 😈")
                         try:
                             await bot.wait_for('reaction_add', timeout=60, check=lambda reaction, user: reaction.emoji == '✅' and user == ctx.message.author)
                         except asyncio.TimeoutError:
@@ -516,7 +519,7 @@ async def sign(ctx, attendance_date_or_url=None):  # here???
                 return
             else:
                 async with ctx.typing():
-                    await ctx.send("Please wait! 💤")
+                    await ctx.send("Sabar sikit woi! 🤬")
                     mmuid = discordid_to_subjectdatabase[ctx.author.id]["StudentID"]
                     mmupassword = discordid_to_subjectdatabase[ctx.author.id]["StudentPassword"]
                     starttime_register = datetime.now() - timedelta(hours=1)
@@ -529,7 +532,7 @@ async def sign(ctx, attendance_date_or_url=None):  # here???
                     with StringIO() as file:
                         await force_sign_attendance(ctx, SubjectDB_obj, attendance_date_or_url, attendance_date_or_url, attendancedate_register, starttime_register, endtime_register, mmuid, mmupassword, file)
                         await ctx.channel.send(f"```{file.getvalue()}```")
-                await ctx.send("Success. You can go back to sleep now. 😴")
+                await ctx.send(f"Mantap, {ctx.author.mention} dah boleh main valo. 🎮🎮🎮")
                 return
             # return  # continue to event/command listener
     else:
