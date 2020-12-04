@@ -4,8 +4,6 @@ Scrape the MMLS website for valid attendance links.
 
 ## Changelog
 
-'''TO-DO'''
-
 1. pls login "id no" - utk login. then nanti dia mintak password
 2. pls qr - kalau nak link attendance utk class harini
 3. pls search date "yyyy-mm-dd" - kalau nak link attendance utk specific date
