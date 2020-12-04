@@ -551,7 +551,7 @@ async def sign(ctx, attendance_date_or_url=None):  # here???
 
 @ bot.event
 async def on_ready():  # finish
-    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="MMU"))
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="MMU 24/7"))
     print(f"Logged in as {bot.user}")
     for guild_list, guild in enumerate(bot.guilds, 1):
         print(f"-> {guild.id}: {guild.name}")

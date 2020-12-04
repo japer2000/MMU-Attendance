@@ -7,11 +7,11 @@ import aiohttp
 import asyncio
 
 MAX_CONCURRENT_REQUESTS = 12
-NETWORK_TIMEOUT = 15
-NETWORK_RETRIES = 3
+NETWORK_TIMEOUT = 30
+NETWORK_RETRIES = 5
 NETWORK_RETRY_BACKOFF = 3
-MAX_TIMETABLE_ID = 499999
-MIN_TIMETABLE_ID = 100000
+MAX_TIMETABLE_ID = 359999
+MIN_TIMETABLE_ID = 5999
 
 
 async def _request(method, url, *, data=None, params=None, headers=None, cookies=None,
@@ -214,7 +214,7 @@ async def date_to_timetable(date, option, *, session=None, semaphore=None):
     session = session or aiohttp.ClientSession()
     async with semaphore:
         while(True):  # Option: 1 for first occurence, -1 for last occurence.
-            curr_ttid = (ubound+lbound)//2
+            curr_ttid = (ubound+lbound)//2  # floor division
             resp = await _request('GET', f"https://mmls.mmu.edu.my/attendance:0:0:{curr_ttid}",
                                   session=session)
             if resp.status == 500:
