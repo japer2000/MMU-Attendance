@@ -1,5 +1,5 @@
 from asyncio.locks import Semaphore
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, time, timedelta
 from os import name
 import mmlsattendance
 import discord
@@ -257,9 +257,10 @@ async def attendance(ctx):  # attendance link for today class
         try:
             if attendance_date_or_url is None:
                 format = "%A, %d %B"
-                printAttendance_date = (datetime.now()).strftime(
+                printAttendance_date = (datetime.utcnow()+timedelta(hours=8)).strftime(
                     format)  # date for today
-                attendance_date_or_url = (datetime.now()).date()
+                attendance_date_or_url = (
+                    datetime.utcnow()+timedelta(hours=8)).date()
             else:
                 attendance_date_or_url = date.fromisoformat(
                     attendance_date_or_url)  # receive inputs of yyyy-mm-dd format
@@ -343,7 +344,7 @@ async def _date(ctx, attendance_startdate=None, attendance_enddate=None):
         try:
             if attendance_startdate is None:
                 attendance_startdate = attendance_enddate = (
-                    (datetime.now()).date()
+                    (datetime.utcnow()+timedelta(hours=8)).date()
                 )
             elif attendance_enddate is None:
                 attendance_enddate = attendance_startdate = (
@@ -433,9 +434,10 @@ async def sign(ctx, attendance_date_or_url=None):  # here???
         try:
             if attendance_date_or_url is None:  # try to detect Value error here
                 format = "%A, %d %B"
-                printAttendance_date = (datetime.now()).strftime(
+                printAttendance_date = (datetime.utcnow()+timedelta(hours=8)).strftime(
                     format)  # date for today
-                attendance_date_or_url = (datetime.now()).date()
+                attendance_date_or_url = (
+                    datetime.utcnow()+timedelta(hours=8)).date()
             elif len(str(attendance_date_or_url)) <= 11:
                 attendance_date_or_url = date.fromisoformat(
                     attendance_date_or_url)  # receive inputs of yyyy-mm-dd format
@@ -451,13 +453,16 @@ async def sign(ctx, attendance_date_or_url=None):  # here???
                         scraped_mmls = check_link_func[1]
                         student_id = discordid_to_subjectdatabase[ctx.author.id]["StudentID"]
                         student_password = discordid_to_subjectdatabase[ctx.author.id]["StudentPassword"]
-                        starttime_register = datetime.now() - timedelta(hours=1)
-                        endtime_register = datetime.now() + timedelta(hours=1)
+                        starttime_register = (
+                            datetime.utcnow() + timedelta(hours=8)) - timedelta(hours=1)
+                        endtime_register = (
+                            datetime.utcnow() + timedelta(hours=8)) + timedelta(hours=1)
                         starttime_register = (starttime_register.time()).isoformat(
                             timespec="seconds")
                         endtime_register = (endtime_register.time()).isoformat(
                             timespec="seconds")
-                        attendancedate_register = (datetime.now()).date()
+                        attendancedate_register = (
+                            datetime.utcnow()+timedelta(hours=8)).date()
                         with StringIO() as file:
                             print(
                                 f"{scraped_mmls.subject_code} - {scraped_mmls.subject_name}\t({scraped_mmls.start_time}-{scraped_mmls.end_time}, {scraped_mmls.class_date})", file=file)
@@ -522,13 +527,16 @@ async def sign(ctx, attendance_date_or_url=None):  # here???
                     await ctx.send("Sabar sikit woi! 🤬")
                     mmuid = discordid_to_subjectdatabase[ctx.author.id]["StudentID"]
                     mmupassword = discordid_to_subjectdatabase[ctx.author.id]["StudentPassword"]
-                    starttime_register = datetime.now() - timedelta(hours=1)
-                    endtime_register = datetime.now() + timedelta(hours=1)
+                    starttime_register = (
+                        datetime.utcnow() + timedelta(hours=8)) - timedelta(hours=1)
+                    endtime_register = (
+                        datetime.utcnow() + timedelta(hours=8)) + timedelta(hours=1)
                     starttime_register = (starttime_register.time()).isoformat(
                         timespec="seconds")
                     endtime_register = (endtime_register.time()).isoformat(
                         timespec="seconds")
-                    attendancedate_register = (datetime.now()).date()
+                    attendancedate_register = (
+                        datetime.utcnow() + timedelta(hours=8)).date()
                     with StringIO() as file:
                         await force_sign_attendance(ctx, SubjectDB_obj, attendance_date_or_url, attendance_date_or_url, attendancedate_register, starttime_register, endtime_register, mmuid, mmupassword, file)
                         await ctx.channel.send(f"```{file.getvalue()}```")
