@@ -433,6 +433,7 @@ async def sign(ctx, attendance_date_or_url=None):  # here???
         SubjectDB_obj = discordid_to_subjectdatabase[ctx.author.id]["SubjectDB"]
         try:
             if attendance_date_or_url is None:  # try to detect Value error here
+                await ctx.send("Sabajap. 💤")
                 format = "%A, %d %B"
                 printAttendance_date = (datetime.utcnow()+timedelta(hours=8)).strftime(
                     format)  # date for today
