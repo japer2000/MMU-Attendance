@@ -23,3 +23,5 @@ mantul la per
 nanti tolong hack valorant sekali''' # done ✅
 
 '''buat pilihan ❌'''
+
+- Added the bot to HEROKU server # done ✅
