@@ -549,4 +549,4 @@ async def on_ready():  # finish
     print(f"Bot is in {guild_list} server.")
 
 
-bot.run("NzcwOTg0MTUwNzYwMDMwMjE4.X5lg8Q.jtTApoeN1bY3crR6VOK2dYJfNGQ")
+bot.run("BOT_TOKEN")
