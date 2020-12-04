@@ -1,6 +1,6 @@
 
 <p align="center">
-  <img src="https://external-content.duckduckgo.com/iu/?u=http%3A%2F%2Fimages.cdn4.stockunlimited.net%2Fclipart%2Fpixel-art-skull_1959058.jpg&f=1&nofb=1" width="350" title="hover text">
+  <img src="https://external-content.duckduckgo.com/iu/?u=http%3A%2F%2Forig04.deviantart.net%2Fcad4%2Ff%2F2015%2F244%2F0%2Fb%2Fpixel_yoko_skull_by_snarky_sharky_art-d982j52.png&f=1&nofb=1" width="350" title="hover text">
 </p>
 
 
