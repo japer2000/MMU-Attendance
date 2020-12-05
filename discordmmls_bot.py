@@ -7,16 +7,17 @@ from discord.ext import commands
 from io import StringIO  # import string IO to print whole string
 import asyncio
 import aiohttp
+import os
 
 # DO NOT SHARE
+
+TOKEN = os.getenv('DISCORD_TOKEN')
 
 bot = commands.Bot(
     command_prefix=["Pls ", "Please ", "please ", "pls ", "PLS ", "!"])
 global_semaphore = asyncio.Semaphore(12)  # the number of allowable task
 discordid_to_subjectdatabase = {}
-# file = StringIO()
 
-# obtain ctx value from the attendance task
 
 '''TO-DO'''
 
@@ -558,4 +559,4 @@ async def on_ready():  # finish
     print(f"Bot is in {guild_list} server.")
 
 
-bot.run("NzcwOTg0MTUwNzYwMDMwMjE4.X5lg8Q.jtTApoeN1bY3crR6VOK2dYJfNGQ")
+bot.run(TOKEN)
