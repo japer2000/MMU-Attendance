@@ -17,9 +17,7 @@ bot = commands.Bot(
     command_prefix=["Pls ", "Please ", "please ", "pls ", "PLS ", "!"])
 global_semaphore = asyncio.Semaphore(12)  # the number of allowable task
 discordid_to_subjectdatabase = {}
-# file = StringIO()
 
-# obtain ctx value from the attendance task
 
 '''TO-DO'''
 
