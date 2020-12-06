@@ -66,8 +66,6 @@ async def display_class(ctx, SubjectDB_obj, date_start, date_end, found_dates, f
     task.cancel()
     await asyncio.wait([task])
 
-### in development #######
-
 
 async def force_sign(ctx, queue, date_register, starttime_register, endtime_register, student_id, student_password, file):
     while True:
@@ -191,15 +189,22 @@ async def login(ctx, studentid=None):  # change here
 @bot.command(aliases=["users"])
 async def user(ctx):
     if discordid_to_subjectdatabase:
-        printlist = "List of users that is currently using the MMLS BOT: 😎\n"
+        printlist = "List of users that is currently using my service: 😎\n"
         for i, discordid in enumerate(discordid_to_subjectdatabase.keys()):
             printlist += f"\n{i+1}.) <@{discordid}> >>> `{discordid_to_subjectdatabase[discordid]['StudentID']}`"
         await ctx.send(
-            f"{printlist}\n\n`This BOT is non-proprietary standard and is mostly used for educational purposes only.The developer shall not hold liable for any act by direct, indirect, incidental, special, exemplary, or consequential that may lead to disciplianry action arising from abusive use of this software.`\n\n**Logout after used.**")
+            f"{printlist}\n\n\n**Logout after used.**")
         return
     else:
         await ctx.send(f"I'm lonely. There's no one using my service. 😢")
         return
+
+
+@bot.command(aliases=["lesen", "licenses"])
+async def license(ctx):
+    await ctx.send(
+        "`This BOT is non-proprietary standard and is mostly created for educational purposes only.The developer specifically shall not hold liable for any act by direct, indirect, incidental, special, exemplary, or consequential that may lead to disciplianry action arising from abusive use of this software.`")
+    return
 
 
 @bot.command()
