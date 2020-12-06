@@ -1,25 +1,12 @@
-from asyncio.locks import Semaphore
-from datetime import date, datetime, time, timedelta
-from os import name
+from datetime import date, datetime, timedelta
 import mmlsattendance
 import discord
 from discord.ext import commands
-from io import StringIO  # import string IO to print whole string
+from io import StringIO
 import asyncio
 import aiohttp
 import os
 
-# DO NOT SHARE
-
-TOKEN = os.getenv('DISCORD_TOKEN')
-
-bot = commands.Bot(
-    command_prefix=["Pls ", "Please ", "please ", "pls ", "PLS ", "!"])
-global_semaphore = asyncio.Semaphore(12)  # the number of allowable task
-discordid_to_subjectdatabase = {}
-
-
-'''TO-DO'''
 
 """1. pls login "id no" - utk login. then nanti dia mintak password
 2. pls qr - kalau nak link attendance utk class harini
@@ -27,19 +14,12 @@ discordid_to_subjectdatabase = {}
 4. pls sign - kalau nak login attendance semua class harini sekaligus
 kredit to : @japer"""
 
-'''Pls user rosak'''
 
-'''mantap, dah boleh main valo'''  # done
-
-''''sabar sikit woi!'''  # done
-
-'''nak paksa masuk tak ?'''  # done
-
-'''aku dah ada password kau :smirk::smirk: 
-mantul la per
-nanti tolong hack valorant sekali'''  # done
-
-'''buat pilihan ❌'''
+TOKEN = os.getenv('DISCORD_TOKEN')
+bot = commands.Bot(
+    command_prefix=["Pls ", "Please ", "please ", "pls ", "PLS ", "!"])
+global_semaphore = asyncio.Semaphore(12)  # the number of allowable task
+discordid_to_subjectdatabase = {}
 
 
 async def printTodiscord_process(ctx, queue, found_dates=set()):
@@ -79,8 +59,6 @@ async def class_today(ctx, queue, found_dates=set(), file=StringIO()):
 
 async def display_class(ctx, SubjectDB_obj, date_start, date_end, found_dates, file=StringIO()):
     queue = asyncio.Queue()
-    # file = StringIO()
-    # task here in parentheses
     task = asyncio.create_task(class_today(
         ctx, queue, found_dates, file))
     await mmlsattendance.scrape_date(SubjectDB_obj, date_start, date_end, queue=queue, semaphore=global_semaphore)
@@ -109,37 +87,30 @@ async def force_sign_attendance(ctx, SubjectDB_obj, date_start, date_end, date_r
     task.cancel()
     await asyncio.wait([task])
 
-##############
-#
-# async def print_timetable():  # prototype
-#    pass
-#    return
 
-
-@ bot.command()  # loads registered subjects and classes from mmls (finish)
-async def login(ctx, studentid=None, password=None):  # change here
+@bot.command()  # loads registered subjects and classes from mmls (finish)
+async def login(ctx, studentid=None):  # change here
     if ctx.author.id in discordid_to_subjectdatabase:
-        await ctx.send(f"Eh...I think you've login before? 😵")
+        await ctx.send(f"Eh...you've not logout from the previous session. 😵")
         return
     else:
         subjectdatabase = mmlsattendance.SubjectDB()  # class for storing database
         dm_channel = await ctx.author.create_dm() or ctx.author.dm_channel
         if studentid == None:
-            await ctx.send(f"DM me your `MMLS credentials`. 🤔")
+            await ctx.send(f"{ctx.author.mention}, DM me your `MMU Student ID`. 🤔")
         elif studentid != None:
-            await ctx.send(f"DM me your `MMLS password`. 🤐")
+            await ctx.send(f"{ctx.author.mention}, DM me your `MMLS password`. 🤐")
         await dm_channel.send(f"Beep Boop, I'm an MMLS bot from {ctx.message.channel.mention}, {ctx.message.guild.name}. 🤖")
         for wrongpass in range(3):
             if studentid == None:
                 for i in range(5):
                     try:
-                        await dm_channel.send(f"Reply with your `MMU Student ID` or `cancel` if you change your mind.")
-                        studentidmsg = await bot.wait_for("message", check=lambda x: x.author == ctx.author, timeout=7)
+                        studentidmsg = await bot.wait_for("message", check=lambda x: x.author == ctx.author, timeout=8)
                         studentid = studentidmsg.content
                         break
                     except asyncio.TimeoutError:
                         if i == 0:
-                            # await dm_channel.send(f"Reply with your `MMU Student ID` or `cancel` if you change your mind.")
+                            await dm_channel.send(f"Reply with your `MMU Student ID` or type `cancel` if you've changed your mind.")
                             continue
                         elif i == 3:
                             await dm_channel.send(f"Hellooo? Are you there? 😩")
@@ -148,7 +119,6 @@ async def login(ctx, studentid=None, password=None):  # change here
                             await dm_channel.send("Im leaving you. 🤬")
                             await ctx.send(f"{ctx.author.mention} didn't notice me. 😭")
                             return
-                # studentid = studentidmsg.content
                 if studentid.lower() == "cancel":
                     await dm_channel.send(f"Changed your mind, huh? I'm leaving. 😑")
                     return
@@ -158,6 +128,7 @@ async def login(ctx, studentid=None, password=None):  # change here
                         password = await bot.wait_for("message", check=lambda x: x.author == ctx.author, timeout=15)
                     except asyncio.TimeoutError:
                         await dm_channel.send("Ghosted me halfway? Fine, I'm leaving.👻")
+                        await ctx.send(f"{ctx.author.mention}, ghosted me halfway. 😭")
                         return
             elif studentid != None:
                 for i in range(5):
@@ -182,8 +153,7 @@ async def login(ctx, studentid=None, password=None):  # change here
                 async with ctx.channel.typing():
                     # this function returns True or False value
                     if await mmlsattendance.load_online(subjectdatabase, studentid, password, semaphore=global_semaphore):
-                        # can go back to channel
-                        await dm_channel.send(f"Done! You can go back to {ctx.message.channel.mention}. 😎")
+                        await dm_channel.send(f"Done! You can go back to {ctx.message.channel.mention}. 👌")
                         break
                     else:
                         if wrongpass == 0:
@@ -218,42 +188,36 @@ async def login(ctx, studentid=None, password=None):  # change here
                 return
 
 
-## code for status bot command ##
-@ bot.command(aliases=["users"])  # finish
+@bot.command(aliases=["users"])
 async def user(ctx):
-    ("\nList of user(s) that is currently using the bot.\n")
     if discordid_to_subjectdatabase:
-        printlist = "```Under Development``` \nUser(s) below are currently using the MMLS service: 🧐\n"
+        printlist = "List of users that is currently using the MMLS BOT: 😎\n"
         for i, discordid in enumerate(discordid_to_subjectdatabase.keys()):
-            printlist += f"\n{i+1}.) <@{discordid}> >>> `{discordid_to_subjectdatabase[ctx.author.id]['StudentID']}`"
-        # await ctx.send(f"```{discorduserlist.getvalue()}```")
-        await ctx.send(f"{printlist}\n\nDo logout after using the service.")
+            printlist += f"\n{i+1}.) <@{discordid}> >>> `{discordid_to_subjectdatabase[discordid]['StudentID']}`"
+        await ctx.send(
+            f"{printlist}\n\n`This BOT is non-proprietary standard and is mostly used for educational purposes only.The developer shall not hold liable for any act by direct, indirect, incidental, special, exemplary, or consequential that may lead to disciplianry action arising from abusive use of this software.`\n\n**Logout after used.**")
         return
     else:
         await ctx.send(f"I'm lonely. There's no one using my service. 😢")
-        # {discordid_to_subjectdatabase[ctx.author.id]}
         return
 
 
-@ bot.command()  # finish
+@bot.command()
 async def logout(ctx):
-    ("\nForgets the subjects and classes of the calling user.\n")
     try:
         discordid_to_subjectdatabase.pop(ctx.author.id)
-        await ctx.send(f"Poof, I've forgotten all your subjects {ctx.author.mention}. 🤓")
+        await ctx.send(f"Poof, I've forgotten all your subjects and MMLS credentials. {ctx.author.mention}. 😉")
         return
     except KeyError:  # happens when user tries to access a key that is not in dictionary, in this context its ctx.author.id
         await ctx.send(f"You weren't even logged in... 🌚")
         return
 
 
-## need to check for bugs and error ##
-@ bot.command(aliases=["qr", "QR", "link", "links"])
-async def attendance(ctx):  # attendance link for today class
+@bot.command(aliases=["qr", "QR", "link", "links"])
+async def attendance(ctx):
     ("\nGives the attendance of all today class for the calling user.\n")
     if ctx.author.id in discordid_to_subjectdatabase:
         attendance_date_or_url = None
-        # attendance_enddate = None
         SubjectDB_obj = discordid_to_subjectdatabase[ctx.author.id]["SubjectDB"]
         try:
             if attendance_date_or_url is None:
@@ -266,19 +230,16 @@ async def attendance(ctx):  # attendance link for today class
                 attendance_date_or_url = date.fromisoformat(
                     attendance_date_or_url)  # receive inputs of yyyy-mm-dd format
         except ValueError:
-            await ctx.send("Me dumb. Gib me in yyyy-mm-dd format pwease? 🥴")
+            await ctx.send("Me dumb. Gib me in `yyyy-mm-dd` format pwease? 🥴")
             return
-        found_dates = set()  # found_dates = set()
-        # refer line 191 discordbot
-        await ctx.send(f"Looking for attendance today. 📡 __{printAttendance_date}__")
+        found_dates = set()
+        await ctx.send(f"Looking for your attendance links. 📡 __{printAttendance_date}__")
         async with ctx.typing():
             try:
                 await scrapeattendance(ctx, SubjectDB_obj, attendance_date_or_url, attendance_date_or_url, found_dates)
             except aiohttp.ClientError as Error:
                 await ctx.send("There's problem connecting to the MMLS. Try again later. 🌏")
-                print(f"MMLS server problem. {Error}")
                 return
-        # print(found_dates)
         if not found_dates:
             await ctx.send(f"You sure there's class today? Try asking for attendance when there's class. 👀\n{ctx.author.mention}")
             return
@@ -286,7 +247,7 @@ async def attendance(ctx):  # attendance link for today class
             await ctx.send(f"{ctx.author.mention} Your attendance link(s) for today. 😴")
             return
     else:
-        await ctx.send(f"❌Obtaining and tampering with attendance URLs without going to the class is wrong and should be penalized.❌\n.\n.\n.\nLog in first will ya? 🤫")
+        await ctx.send(f"❌Obtaining and tampering with attendance URLs without going to the class is wrong and should be penalized.❌\n**Log in first will ya?** 🤫")
         return
 
 
@@ -294,7 +255,7 @@ async def attendance(ctx):  # attendance link for today class
 async def scrape(ctx):  # prototype
     ("\nHelp here.\n")
     if ctx.invoked_subcommand is None:
-        await ctx.send(f"Search what, by dates or timetable ID? 🤡")
+        await ctx.send(f"Search what, by dates or timetable id? 🤡")
 
 
 # best way to search for attendance
@@ -307,7 +268,8 @@ async def timetableid(ctx, start_timetable, end_timetable):  # finish
             start_timetable, end_timetable = int(
                 start_timetable), int(end_timetable)
         except TypeError:
-            await ctx.send(f"Huh? I need integers. Can I have integers with that command?")
+            await ctx.send(f"What're you doing??? Leave me alone. 😡")
+            return
         await ctx.send(f"Searching timetable from {start_timetable} to {end_timetable}... 📡")
         async with ctx.channel.typing():
             try:
@@ -321,10 +283,10 @@ async def timetableid(ctx, start_timetable, end_timetable):  # finish
             await ctx.send("No attendance link(s) found. 👀")
             return
         else:
-            await ctx.send(f"Done! That's all the attendance from {start_timetable} to {end_timetable}. 😉")
+            await ctx.send(f"Done! That's all the attendance from {start_timetable} to {end_timetable}. 😪")
             return
     else:
-        await ctx.send(f"❌Obtaining and tampering with attendance URLs without going to the class is wrong and should be penalized.❌\n.\n.\n.\nLog in first will ya? 🤫")
+        await ctx.send(f"❌Obtaining and tampering with attendance URLs without going to the class is wrong and should be penalized.❌\n**Log in first will ya?** 🤫")
         return
 
 
@@ -360,11 +322,6 @@ async def _date(ctx, attendance_startdate=None, attendance_enddate=None):
         except ValueError:
             await ctx.send(f"Me dumb. Gib me in yyyy-mm-dd format pwease? 🥴")
             return
-        # """if attendance_startdate is None and attendance_enddate is None:
-        #    attendance_startdate = (datetime.now()).date()  # date for today
-        # else:
-        #    attendance_startdate = date.fromisoformat(
-        #        attendance_startdate)  # receive inputs of yyyy-mm-dd format"""
         if attendance_startdate != attendance_enddate:  # print if attendance is a range
             await ctx.send(f"Looking for attendance from {attendance_startdate.isoformat()} to {attendance_enddate.isoformat()}. 📡")
         elif attendance_startdate == attendance_enddate:  # print if search only one date
@@ -376,15 +333,15 @@ async def _date(ctx, attendance_startdate=None, attendance_enddate=None):
                 found_dates.discard(date_num)
         if not found_dates:  # if found dates is empty, go here
             if attendance_startdate != attendance_startdate:
-                await ctx.send(f"Here's the attendance from {attendance_startdate} to {attendance_enddate}, I guess. 😬")
+                await ctx.send(f"Here's the attendance from {attendance_startdate} to {attendance_enddate}. ✨")
             elif attendance_startdate == attendance_enddate:
-                await ctx.send(f"Here's the attendance for the date {attendance_startdate}, I guess. 😬")
+                await ctx.send(f"Here's the attendance for the date {attendance_startdate}. ✨")
             return
         else:
-            await ctx.send(f"Hrmm, I've probably missed some attendance URLs due to technical issue. Try using the timetable ID range search instead. 😅")
+            await ctx.send(f"The timetable id for this semester must be quite large. Try using the search by timetable id.")
             return
     else:
-        await ctx.send(f"❌Obtaining and tampering with attendance URLs without going to the class is wrong and should be penalized.❌\n.\n.\n.\nLog in first will ya? 🤫")
+        await ctx.send(f"❌Obtaining and tampering with attendance URLs without going to the class is wrong and should be penalized.❌\n**Log in first will ya?** 🤫")
         return
 
 
@@ -415,41 +372,41 @@ async def print_subjects(ctx):
                 if subject_no != len(SubjectDB_obj.subjects):
                     print('', file=f)
             await ctx.channel.send(f"Here's your registered subjects and their classes:\n```{f.getvalue()}```")
+            return
     else:
-        await ctx.send(f"❌Obtaining and tampering with attendance URLs without going to the class is wrong and should be penalized.❌\n.\n.\n.\nLog in first will ya? 🤫")
+        await ctx.send(f"❌Obtaining and tampering with attendance URLs without going to the class is wrong and should be penalized.❌\n**Log in first will ya?** 🤫")
         return
 
 
-@bot.command(alias=["lancau"])
+@bot.command(alias=["lancau", "man", "hitam", "sabah"])
 async def aiman(ctx):
-    ctx.send("Aiman tak hensem. Dahla Hitam.")
+    await ctx.send("Aiman tak hensem. Dahla Hitam.")
     return
 
 
-@ bot.command()  # Prototype
+@bot.command()  # Prototype
 async def sign(ctx, attendance_date_or_url=None):  # here???
     if ctx.author.id in discordid_to_subjectdatabase:
-        # attendance_date_or_url = None
-        # attendance_enddate = None
         SubjectDB_obj = discordid_to_subjectdatabase[ctx.author.id]["SubjectDB"]
         try:
             if attendance_date_or_url is None:  # try to detect Value error here
-                await ctx.send("Sabajap. 💤")
+                await ctx.send("Fetching your attendance links from MMLS. ☁")
                 format = "%A, %d %B"
                 printAttendance_date = (datetime.utcnow()+timedelta(hours=8)).strftime(
                     format)  # date for today
                 attendance_date_or_url = (
                     datetime.utcnow()+timedelta(hours=8)).date()
             elif len(str(attendance_date_or_url)) <= 11:
+                await ctx.send("Fetching your attendance links from MMLS. ☁")
                 attendance_date_or_url = date.fromisoformat(
                     attendance_date_or_url)  # receive inputs of yyyy-mm-dd format
                 format = "%A, %d %B"
                 printAttendance_date = attendance_date_or_url.strftime(format)
             else:
                 async with ctx.typing():
+                    await ctx.send("Validating your link. Please wait. 💤")
                     check_link_func = await mmlsattendance.checkmmls_link(attendance_date_or_url, SubjectDB_obj)
                     check_link = check_link_func[0]
-
                     if check_link == True:
                         # continue with sign in
                         scraped_mmls = check_link_func[1]
@@ -480,7 +437,6 @@ async def sign(ctx, attendance_date_or_url=None):  # here???
                             scraped_mmls.attendance_url, scraped_mmls.class_id, attendancedate_register, starttime_register, endtime_register, scraped_mmls.timetable_id, student_id, student_password, semaphore=global_semaphore)
                         await ctx.send(f"```{status}```")
                         await ctx.send("Done!")
-                        # print(scraped_mmls.timetable_id)
                         return
                     elif await mmlsattendance.checkmmls_link(attendance_date_or_url, SubjectDB_obj) == False:
                         await ctx.send("it is MMLS attendance link but not registered class")
@@ -499,58 +455,47 @@ async def sign(ctx, attendance_date_or_url=None):  # here???
             try:  # Func. that scrape #
                 with StringIO() as file:
                     await display_class(ctx, SubjectDB_obj, attendance_date_or_url, attendance_date_or_url, found_dates, file)
-                    if file.getvalue() != None:
+                    if found_dates:
                         stringio_class = await ctx.send(f"```{file.getvalue()}```")
                         await stringio_class.add_reaction("✅")
-                    elif file.getvalue() == None:
-                        pass
-                # await stringio_class.add_reaction("❌") PROTOTYPE
+                    elif not found_dates:
+                        await ctx.send(f"{ctx.author.mention}, there's no class on _{printAttendance_date}_. 😪")
+                        return
             except aiohttp.ClientError as Error:
                 await ctx.send("There's problem connecting to the MMLS. Try again later. 🌏")
                 print(f"MMLS server problem. 🖥 {Error}")
                 return
-        if not found_dates:
-            await ctx.send(f"There's no class on the date you've mentioned. Try again when there's class. 👀\n{ctx.author.mention}")
+        await ctx.send(f"Force-sign-in attendance(s) link? ")
+        try:
+            await bot.wait_for('reaction_add', timeout=60, check=lambda reaction, user: reaction.emoji == '✅' and user == ctx.message.author)
+        except asyncio.TimeoutError:
+            await ctx.send(f"{ctx.author.mention} Ghosted me halfway eh? Boohoo. 👻")
             return
-        else:
-            # await ctx.send(f"{ctx.author.mention} Your class for __{printAttendance_date}__. 😴")
-            await ctx.send(f"Force-sign-in attendance(s) link? ")
-
-            # def check(reaction, user):
-            #    return user == ctx.message.author and str(reaction.emoji == '✅')
-
-            try:
-                await bot.wait_for('reaction_add', timeout=60, check=lambda reaction, user: reaction.emoji == '✅' and user == ctx.message.author)
-            except asyncio.TimeoutError:
-                await ctx.send(f"{ctx.author.mention} Ghosted me halfway eh? Boohoo. 👻")
-                return
-            else:
-                async with ctx.typing():
-                    await ctx.send("Sabar sikit woi! 🤬")
-                    mmuid = discordid_to_subjectdatabase[ctx.author.id]["StudentID"]
-                    mmupassword = discordid_to_subjectdatabase[ctx.author.id]["StudentPassword"]
-                    starttime_register = (
-                        datetime.utcnow() + timedelta(hours=8)) - timedelta(hours=1)
-                    endtime_register = (
-                        datetime.utcnow() + timedelta(hours=8)) + timedelta(hours=1)
-                    starttime_register = (starttime_register.time()).isoformat(
-                        timespec="seconds")
-                    endtime_register = (endtime_register.time()).isoformat(
-                        timespec="seconds")
-                    attendancedate_register = (
-                        datetime.utcnow() + timedelta(hours=8)).date()
-                    with StringIO() as file:
-                        await force_sign_attendance(ctx, SubjectDB_obj, attendance_date_or_url, attendance_date_or_url, attendancedate_register, starttime_register, endtime_register, mmuid, mmupassword, file)
-                        await ctx.channel.send(f"```{file.getvalue()}```")
-                await ctx.send(f"Mantap, {ctx.author.mention} dah boleh main valo. 🎮🎮🎮")
-                return
-            # return  # continue to event/command listener
+        await ctx.send("Sabar sikit woi! 🤬")
+        async with ctx.typing():
+            mmuid = discordid_to_subjectdatabase[ctx.author.id]["StudentID"]
+            mmupassword = discordid_to_subjectdatabase[ctx.author.id]["StudentPassword"]
+            starttime_register = (
+                datetime.utcnow() + timedelta(hours=8)) - timedelta(hours=1)
+            endtime_register = (
+                datetime.utcnow() + timedelta(hours=8)) + timedelta(hours=1)
+            starttime_register = (starttime_register.time()).isoformat(
+                timespec="seconds")
+            endtime_register = (endtime_register.time()).isoformat(
+                timespec="seconds")
+            attendancedate_register = (
+                datetime.utcnow() + timedelta(hours=8)).date()
+            with StringIO() as file:
+                await force_sign_attendance(ctx, SubjectDB_obj, attendance_date_or_url, attendance_date_or_url, attendancedate_register, starttime_register, endtime_register, mmuid, mmupassword, file)
+                await ctx.channel.send(f"```{file.getvalue()}```")
+        await ctx.send(f"Mantap @everyone, {ctx.author.mention} dah boleh main valo. 🎮")
+        return
     else:
-        await ctx.send((f"❌Obtaining and tampering with attendance URLs without going to the class is wrong and should be penalized.❌\n.\n.\n.\nLog in first will ya? 🤫"))
+        await ctx.send((f"❌Obtaining and tampering with attendance URLs without going to the class is wrong and should be penalized.❌\n**Log in first will ya?** 🤫"))
         return
 
 
-@ bot.event
+@bot.event
 async def on_ready():  # finish
     await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="MMU 24/7"))
     print(f"Logged in as {bot.user}")

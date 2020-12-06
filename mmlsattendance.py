@@ -64,8 +64,7 @@ async def load_online(SubjectDB_obj, user_id, password, *, semaphore=None):
         for code, name, sid, coid in names_and_links:
             subjectdb.add_subject(int(sid), code=code,
                                   name=name, coordinator_id=int(coid))
-        # ===== Parse classes =====
-
+        # ===== Parse classes ===== #
         async def parse_classes(subject, session, semaphore):
             sid, coid = subject.id, subject.coordinator_id
             class_list_url = f"https://mmls.mmu.edu.my/studentlist:{sid}:{coid}:0"
@@ -90,12 +89,10 @@ async def autoselect_classes(SubjectDB_obj, user_id, *, semaphore=None):
     """Autoselects classes in a SubjectDB object that the user, with the given
     student ID, has registered for in the current trimester."""
     semaphore = semaphore or asyncio.Semaphore(MAX_CONCURRENT_REQUESTS)
-
     async def select_if_registered(user_id, class_queue, semaphore):
         not_reg_xpath = "//div[@class='alert alert-danger']/text()='You are not register to this class.'"
         async with aiohttp.ClientSession() as session:
-            temp = await _request('GET', 'https://mmls.mmu.edu.my/attendance:0:0:1', session=session)
-            #print(f"mmls.mmu.edu.my/attendance:0:0:1: {temp.status}")
+            await _request('GET', 'https://mmls.mmu.edu.my/attendance:0:0:1', session=session)
             while True:
                 async with semaphore:
                     kelas = await class_queue.get()
@@ -105,7 +102,6 @@ async def autoselect_classes(SubjectDB_obj, user_id, *, semaphore=None):
                         'Referer': 'https://mmls.mmu.edu.my/attendance:0:0:1'}
                     resp = await _request('POST', 'https://mmls.mmu.edu.my/attendancelogin',
                                           data=data, headers=headers, session=session)
-                    #print(f"mmls.mmu.edu.my/attendancelogin: {resp.status}")
                     tree = etree.parse(StringIO(await resp.text()), etree.HTMLParser())
                     if not tree.xpath(not_reg_xpath):
                         kelas.selected = True
@@ -135,7 +131,6 @@ async def scrape(SubjectDB_obj, start_timetable_id, end_timetable_id, *, queue=N
             _request('GET', f"https://mmls.mmu.edu.my/attendance:0:0:{timetable_id}",
                      session=session, semaphore=semaphore))
                  for timetable_id in range(start_timetable_id, end_timetable_id+1)]
-        #print(f"mmls.mmu.edu.my/: {temp.status}")
         class_id_to_class_obj = {
             kelas.id: kelas for kelas in SubjectDB_obj.selected_classes}
         while tasks:
@@ -252,17 +247,13 @@ async def sign_now(url, classid, date_register, starttime_register, endtime_regi
         cookie = client.cookies
         token = tree.xpath("//input[@name='_token']/@value")[0]
         headers = {'Referer': url}
-        # print(token)
         data = {
             'class_id': classid, 'class_date': date_register, 'starttime': starttime_register, 'endtime': endtime_register, 'timetable_id': ttid, 'stud_id': student_id,
             'stud_pswrd': student_password, '_token': token}
         client = await _request('POST', 'https://mmls.mmu.edu.my/attendancelogin', data=data, headers=headers, cookies=cookie, session=session, semaphore=semaphore)
-        # print(aw ait resp.text())
-        # print(await client.text())  # print full status here
         tree = etree.parse(StringIO(await client.text()), etree.HTMLParser())
         status = tree.xpath(
             "//div[@class='container-fluid']/div[@class='row']/div[@class='col-sm-8']/div/text()")[0]
-        # print(status)
     return status
 
 
@@ -271,10 +262,6 @@ async def checkmmls_link(url, SubjectDB_obj):
     async with aiohttp.ClientSession() as session:
         try:
             client = await _request('GET', url, session=session, semaphore=semaphore)
-            # if client.status == 500:
-            #    print("Internal server Error")
-            # elif client.status == 404:
-            #    print("Not Found")
             tree = etree.parse(StringIO(await client.text()), etree.HTMLParser())
             head_tag = tree.xpath("//head/text()")
             reference_head = await _request('GET', 'https://mmls.mmu.edu.my/attendance:0:0:1', session=session, semaphore=semaphore)
@@ -305,7 +292,7 @@ async def checkmmls_link(url, SubjectDB_obj):
                     )
                     return True, scraped_timetable  # it is a link and you are registered class
                 else:
-                    return False  # it is a link and you are  NOT registered class
+                    return False  # it is a link and you are NOT registered class
             else:
                 return url  # if it is a link but not an mmls attendance link
         except aiohttp.ClientError:  # if it is not a link
