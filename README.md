@@ -31,3 +31,5 @@ nanti tolong hack valorant sekali''' # done ✅
 '''buat pilihan ❌'''
 
 - Added the bot to HEROKU server # done ✅
+- 12/06/2020 "Update and cleanup mmlsattendance.py and discordmmls_bot.py"
+- 12/06/2020 " No error from alpha testing(self testing)"
