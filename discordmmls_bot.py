@@ -189,7 +189,7 @@ async def login(ctx, studentid=None):  # change here
 @bot.command(aliases=["users"])
 async def user(ctx):
     if discordid_to_subjectdatabase:
-        printlist = "List of users that is currently using my service: 😎\n"
+        printlist = "List of users that is currently using my service: 🎲\n"
         for i, discordid in enumerate(discordid_to_subjectdatabase.keys()):
             printlist += f"\n{i+1}.) <@{discordid}> >>> `{discordid_to_subjectdatabase[discordid]['StudentID']}`"
         await ctx.send(
@@ -493,7 +493,7 @@ async def sign(ctx, attendance_date_or_url=None):  # here???
             with StringIO() as file:
                 await force_sign_attendance(ctx, SubjectDB_obj, attendance_date_or_url, attendance_date_or_url, attendancedate_register, starttime_register, endtime_register, mmuid, mmupassword, file)
                 await ctx.channel.send(f"```{file.getvalue()}```")
-        await ctx.send(f"Mantap @everyone, {ctx.author.mention} dah boleh main valo. 🎮")
+        await ctx.send(f"Manta, {ctx.author.mention} dah boleh main valo. 🎮")
         return
     else:
         await ctx.send((f"❌Obtaining and tampering with attendance URLs without going to the class is wrong and should be penalized.❌\n**Log in first will ya?** 🤫"))
