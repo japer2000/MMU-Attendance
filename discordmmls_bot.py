@@ -493,7 +493,7 @@ async def sign(ctx, attendance_date_or_url=None):  # here???
             with StringIO() as file:
                 await force_sign_attendance(ctx, SubjectDB_obj, attendance_date_or_url, attendance_date_or_url, attendancedate_register, starttime_register, endtime_register, mmuid, mmupassword, file)
                 await ctx.channel.send(f"```{file.getvalue()}```")
-        await ctx.send(f"Manta, {ctx.author.mention} dah boleh main valo. 🎮")
+        await ctx.send(f"Mantap, {ctx.author.mention} dah boleh main valo. 🎮")
         return
     else:
         await ctx.send((f"❌Obtaining and tampering with attendance URLs without going to the class is wrong and should be penalized.❌\n**Log in first will ya?** 🤫"))
