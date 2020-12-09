@@ -196,7 +196,7 @@ async def user(ctx):
             f"{printlist}\n\n\n**Logout after used.**")
         return
     else:
-        await ctx.send(f"I'm lonely. There's no one using my service. 😢")
+        await ctx.send(f"None. I've forgotten all your subjects to free-up resources. 😢")
         return
 
 
@@ -238,7 +238,7 @@ async def attendance(ctx):
             await ctx.send("Me dumb. Gib me in `yyyy-mm-dd` format pwease? 🥴")
             return
         found_dates = set()
-        await ctx.send(f"Looking for your attendance links. 📡 __{printAttendance_date}__")
+        await ctx.send(f"Fetching your attendance links from MMLS... ☁\n __{printAttendance_date}__")
         async with ctx.typing():
             try:
                 await scrapeattendance(ctx, SubjectDB_obj, attendance_date_or_url, attendance_date_or_url, found_dates)
@@ -249,7 +249,7 @@ async def attendance(ctx):
             await ctx.send(f"You sure there's class today? Try asking for attendance when there's class. 👀\n{ctx.author.mention}")
             return
         else:
-            await ctx.send(f"{ctx.author.mention} Your attendance link(s) for today. 😴")
+            await ctx.send(f"{ctx.author.mention}, done! 😴")
             return
     else:
         await ctx.send(f"❌Obtaining and tampering with attendance URLs without going to the class is wrong and should be penalized.❌\n**Log in first will ya?** 🤫")
@@ -281,14 +281,14 @@ async def timetableid(ctx, start_timetable, end_timetable):  # finish
                 await scrapeattendance(ctx, SubjectDB_obj, start_timetable, end_timetable, found_dates)
             except aiohttp.ClientError:
                 # if MMLS server got problem retrieving the attendance
-                await ctx.send("There's problem connecting to the MMLS. Try again later. 📡")
+                await ctx.send("There's problem connecting to the MMLS. Try again later. 🌏")
                 print(aiohttp.ClientError)
                 return
         if found_dates == set():
-            await ctx.send("No attendance link(s) found. 👀")
+            await ctx.send(f"Done. {ctx.author.mention}, no attendance links found. 👀")
             return
         else:
-            await ctx.send(f"Done! That's all the attendance from {start_timetable} to {end_timetable}. 😪")
+            await ctx.send(f"Done! {ctx.author.mention}, that's all the attendance from {start_timetable} to {end_timetable}. 😪")
             return
     else:
         await ctx.send(f"❌Obtaining and tampering with attendance URLs without going to the class is wrong and should be penalized.❌\n**Log in first will ya?** 🤫")
@@ -328,9 +328,9 @@ async def _date(ctx, attendance_startdate=None, attendance_enddate=None):
             await ctx.send(f"Me dumb. Gib me in yyyy-mm-dd format pwease? 🥴")
             return
         if attendance_startdate != attendance_enddate:  # print if attendance is a range
-            await ctx.send(f"Looking for attendance from {attendance_startdate.isoformat()} to {attendance_enddate.isoformat()}. 📡")
+            await ctx.send(f"Searching for attendance from {attendance_startdate.isoformat()} to {attendance_enddate.isoformat()}. 📡")
         elif attendance_startdate == attendance_enddate:  # print if search only one date
-            await ctx.send(f"Looking for attendance on the date {attendance_startdate.isoformat()}. 📡")
+            await ctx.send(f"Searching for attendance on the date {attendance_startdate.isoformat()}. 📡")
         async with ctx.typing():
             await scrapeattendance(ctx, SubjectDB_obj, attendance_startdate, attendance_enddate, found_dates)
             for date_num in (attendance_startdate + timedelta(days=d) for d in range((attendance_enddate-attendance_startdate).days+1)):
@@ -338,9 +338,9 @@ async def _date(ctx, attendance_startdate=None, attendance_enddate=None):
                 found_dates.discard(date_num)
         if not found_dates:  # if found dates is empty, go here
             if attendance_startdate != attendance_startdate:
-                await ctx.send(f"Here's the attendance from {attendance_startdate} to {attendance_enddate}. ✨")
+                await ctx.send(f"{ctx.author.mention}, here's the attendance from {attendance_startdate} to {attendance_enddate}. ✨")
             elif attendance_startdate == attendance_enddate:
-                await ctx.send(f"Here's the attendance for the date {attendance_startdate}. ✨")
+                await ctx.send(f"{ctx.author.mention}, here's the attendance for the date {attendance_startdate}. ✨")
             return
         else:
             await ctx.send(f"The timetable id for this semester must be quite large. Try using the search by timetable id.")
@@ -395,14 +395,14 @@ async def sign(ctx, attendance_date_or_url=None):  # here???
         SubjectDB_obj = discordid_to_subjectdatabase[ctx.author.id]["SubjectDB"]
         try:
             if attendance_date_or_url is None:  # try to detect Value error here
-                await ctx.send("Fetching your attendance links from MMLS. ☁")
+                await ctx.send("Fetching your attendance links from MMLS... ☁")
                 format = "%A, %d %B"
                 printAttendance_date = (datetime.utcnow()+timedelta(hours=8)).strftime(
                     format)  # date for today
                 attendance_date_or_url = (
                     datetime.utcnow()+timedelta(hours=8)).date()
             elif len(str(attendance_date_or_url)) <= 11:
-                await ctx.send("Fetching your attendance links from MMLS. ☁")
+                await ctx.send("Fetching your attendance links from MMLS... ☁")
                 attendance_date_or_url = date.fromisoformat(
                     attendance_date_or_url)  # receive inputs of yyyy-mm-dd format
                 format = "%A, %d %B"
