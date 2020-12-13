@@ -389,6 +389,12 @@ async def aiman(ctx):
     return
 
 
+@bot.command(alias=["ajiq", "seremban", "jiq"])
+async def haziq(ctx):
+    await ctx.send("<@702422034034196502>, diam ah jiq.")
+    return
+
+
 @bot.command()  # Prototype
 async def sign(ctx, attendance_date_or_url=None):  # here???
     if ctx.author.id in discordid_to_subjectdatabase:
