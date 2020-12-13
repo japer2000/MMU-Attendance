@@ -385,7 +385,7 @@ async def print_subjects(ctx):
 
 @bot.command(alias=["lancau", "man", "hitam", "sabah"])
 async def aiman(ctx):
-    await ctx.send("Aiman tak hensem. Dahla Hitam.")
+    await ctx.send("<@393267892369621012>, Aiman tak hensem. Dahla Hitam.")
     return
 
 
