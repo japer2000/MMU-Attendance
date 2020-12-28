@@ -11,7 +11,7 @@ NETWORK_TIMEOUT = 30
 NETWORK_RETRIES = 5
 NETWORK_RETRY_BACKOFF = 3
 MAX_TIMETABLE_ID = 999999
-MIN_TIMETABLE_ID = 999
+MIN_TIMETABLE_ID = 1
 
 
 async def _request(method, url, *, data=None, params=None, headers=None, cookies=None,
