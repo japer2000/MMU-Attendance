@@ -10,7 +10,7 @@ MAX_CONCURRENT_REQUESTS = 12
 NETWORK_TIMEOUT = 30
 NETWORK_RETRIES = 5
 NETWORK_RETRY_BACKOFF = 3
-MAX_TIMETABLE_ID = 999999
+MAX_TIMETABLE_ID = 1999999
 MIN_TIMETABLE_ID = 1
 
 
@@ -65,6 +65,7 @@ async def load_online(SubjectDB_obj, user_id, password, *, semaphore=None):
             subjectdb.add_subject(int(sid), code=code,
                                   name=name, coordinator_id=int(coid))
         # ===== Parse classes ===== #
+
         async def parse_classes(subject, session, semaphore):
             sid, coid = subject.id, subject.coordinator_id
             class_list_url = f"https://mmls.mmu.edu.my/studentlist:{sid}:{coid}:0"
@@ -89,6 +90,7 @@ async def autoselect_classes(SubjectDB_obj, user_id, *, semaphore=None):
     """Autoselects classes in a SubjectDB object that the user, with the given
     student ID, has registered for in the current trimester."""
     semaphore = semaphore or asyncio.Semaphore(MAX_CONCURRENT_REQUESTS)
+
     async def select_if_registered(user_id, class_queue, semaphore):
         not_reg_xpath = "//div[@class='alert alert-danger']/text()='You are not register to this class.'"
         async with aiohttp.ClientSession() as session:
